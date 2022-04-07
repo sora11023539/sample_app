@@ -5,9 +5,9 @@
     <!--セキュリティー対策-->
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <!--stylesheetとjavascriptをページ内にインクルードする-->
-    <%= stylesheet_link_tag ... %>
-    <%= javascript_pack_tag "application", ... %>
+    <!--cssとjsの読み込み-->
+    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
   </head>
   <body>
     <!--各ページの内容をレイアウトに挿入する-->
