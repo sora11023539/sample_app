@@ -8,9 +8,14 @@
     <!--cssとjsの読み込み-->
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <!--partial-->
+    <%= render 'layouts/shim' %>
   </head>
   <body>
-    <!--各ページの内容をレイアウトに挿入する-->
-    <%= yield %>
+    <%= render 'layouts/header' %>
+    <div class="container">
+      <%= yield %>
+      <%= render 'layouts/footer' %>
+    </div>
   </body>
 </html>
