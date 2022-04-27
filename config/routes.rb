@@ -7,4 +7,7 @@ Rails.application.routes.draw do
   get '/about', to: 'static_pages#about'
   get '/contact', to: 'static_pages#contact'
   get '/signup', to: 'users#new'
+  # ユーザー情報を表示するURLを追加する
+  # resour 7つのアクションを自動で定義
+  resources :users
 end
