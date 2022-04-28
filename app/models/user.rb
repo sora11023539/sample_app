@@ -18,4 +18,13 @@ class User < ApplicationRecord
     
     # 最小文字数
     validates :password, presence: true, length: { minimum: 6 }
+    
+    # 渡された文字列のハッシュ値を返す
+    def User.digest(string)
+        # コストパラメータ(ハッシュを算出するための)をテスト中は最小に
+        cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :
+                                                      BCrypt::Engine.cost
+                                                      # pass生成
+                                                      BCrypt::Password.create(string, cost: cost)
+    end
 end
