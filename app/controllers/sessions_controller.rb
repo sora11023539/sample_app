@@ -4,11 +4,12 @@ class SessionsController < ApplicationController
   
   def create
     # 送信されたemailと同じものを探す
-    user = User.find_by(email: params[:session][:email].downcase)
+    @user = User.find_by(email: params[:session][:email].downcase)
     # passが認証されたら
-    if user&.authenticate(params[:session][:password])
-      log_in user
-      redirect_to user
+    if @user && @user.authenticate(params[:session][:password])
+      log_in @user
+      params[:session][:remember_me] == '1' ? remember(@user) : forget(@user)
+      redirect_to @user
     else
       # flash.now リクエストが発生したら消える
       flash.now[:danger] = 'Invalid email/password combination'
@@ -17,7 +18,8 @@ class SessionsController < ApplicationController
   end
   
   def destroy
-    log_out
+    # logged_in?がtrueの場合にlog_outを呼び出す
+    log_out if logged_in?
     redirect_to root_url
   end
 end
