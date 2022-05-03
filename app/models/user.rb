@@ -17,9 +17,9 @@ class User < ApplicationRecord
     
     # ハッシュ化
     has_secure_password
-    
-    # 最小文字数
-    validates :password, presence: true, length: { minimum: 6 }
+    # allow_nil 対象の値がnilの時、skipする
+    # has_secure_password オブジェクト生成時に存在性を検証しているので、有効になることはない
+    validates :password, presence: true, length: { minimum: 6 }, allow_nil: true
     
     # deigest new_token 定義
     class << self
