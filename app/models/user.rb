@@ -1,8 +1,10 @@
 class User < ApplicationRecord
     # 読み取り、書き込みの両方を定義できる
-    attr_accessor :remember_token
+    attr_accessor :remember_token, :activation_token
     # callbaxk 保存する前に小文字に変換
-    before_save { email.downcase! }
+    before_save :downcase_email
+    # メソッド参照 メソッドを探し、ユーザー作成の前に実行
+    before_create :create_activation_digest
     # nema属性の存在性を検証する
     validates :name, presence: true, length: { maximum: 50 }
     # email属性の存在性を検証する
@@ -56,5 +58,36 @@ class User < ApplicationRecord
     # ユーザーのログイン情報を破棄
     def forget
         update_attribute(:remember_digest, nil)
+    end
+    
+    # tokenがdigestと一致したらtrueを返す
+    # 他の認証でも使えるように第二引数でtoken
+    def authenticated?(attribute, token)
+        digest = send("#{attribute}_digest")
+        return false if digest.nil?
+        BCrypt::Password.new(digest).is_password?(token)
+    end
+    
+    # アカウントを有効にする
+    def activate
+        update_columns(activated: true, activated_at: Time.zone.now)
+    end
+    
+    # 有効化用のメールを送信する
+    def send_activation_email
+        UserMailer.account_activation(self).deliver_naw
+    end
+    
+    private
+    
+    # emailを全て小文字に
+    def downcase_email
+        self.email = email.downcase
+    end
+    
+    # 有効化トークンとダイジェストを作成及び代入
+    def create_activation_digest
+        self.activation_token = User.new_token
+        self.activation_digest = User.digest(activation_token)
     end
 end

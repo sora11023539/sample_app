@@ -21,13 +21,10 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
     # 保存されたら
     if @user.save
-      # loginする
-      log_in @user
-      # flash 1回のみ succsessにメッセージ
-      flash[:success] = "Welcome to the Sample App!"
-      # redirect_to user_url(@user)と等価
-      # ユーザー情報ページにリダイレクト
-      redirect_to @user
+      # mail送信
+      @user.send_activation_email
+      flash[:info] = "Please check your email to activate your account."
+      redirect_to root_url
     else
       render 'new'
     end
@@ -46,7 +43,14 @@ class UsersController < ApplicationController
   end
   
   def index
+    @users = User.where(activated: true.pagenate(page:params[:page]))
     @users = User.paginate(page: params[:page])
+  end
+  
+  def show
+    @user = User.find(params[:id])
+    # and == &&よりも優先度高い
+    redirect_to root_url and return unless @user.activated?
   end
   
   def destroy

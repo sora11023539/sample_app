@@ -4,17 +4,23 @@ class SessionsController < ApplicationController
   
   def create
     # 送信されたemailと同じものを探す
-    @user = User.find_by(email: params[:session][:email].downcase)
+    user = User.find_by(email: params[:session][:email].downcase)
     # passが認証されたら
-    if @user && @user.authenticate(params[:session][:password])
-      log_in @user
-      params[:session][:remember_me] == '1' ? remember(@user) : forget(@user)
-      # フォワーディング リクされたURLが存在する場合、そこにリダイレクト ない場合デフォルトURLにリダイレクト
-      redirect_back_or @user
+    if user && user.authenticate(params[:session][:password])
+      if user.activated?
+        log_in user
+        params[:session][:remember_me] == '1' ? remember(user) : forget(user)
+        # フォワーディング リクされたURLが存在する場合、そこにリダイレクト ない場合デフォルトURLにリダイレクト
+        redirect_back_or user
+      else
+        message = "Account not activated. "
+        message += "Check your email for the activation link."
+        flas[:warning] = message
+        redirect_to root_url
+      end
     else
-      # flash.now リクエストが発生したら消える
       flash.now[:danger] = 'Invalid email/password combination'
-      render 'new' # new view 出力
+      render 'new'
     end
   end
   
