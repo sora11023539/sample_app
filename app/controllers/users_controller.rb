@@ -51,6 +51,8 @@ class UsersController < ApplicationController
   
   def show
     @user = User.find(params[:id])
+    # microposts変数をwill_pagenateに渡す
+    @microposts = @user.microposts.paginate(page: params[:page])
     # and == &&よりも優先度高い
     redirect_to root_url and return unless @user.activated?
   end
@@ -67,17 +69,6 @@ class UsersController < ApplicationController
   def user_params
     params.require(:user).permit(:name, :email, :password,
                                  :password_confirmation)
-  end
-  
-  # ログイン済みユーザーかどうか確認
-  def logged_in_user
-    # unless falseの時に実行
-    unless logged_in?
-      store_location
-      flash[:danger] = "Please log in."
-      # login ページに転送
-      redirect_to login_url
-    end
   end
   
   # 正しいユーザーかどうか確認

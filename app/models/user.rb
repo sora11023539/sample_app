@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+    # micropostを複数所有する関連づけ
+    has_many :microposts, dependent: :destroy
     # 読み取り、書き込みの両方を定義できる
     attr_accessor :remember_token, :activation_token, :reset_token
     # callbaxk 保存する前に小文字に変換
@@ -92,6 +94,12 @@ class User < ApplicationRecord
     # pass再設定の期限が切れている場合はtrue
     def password_reset_expired?
         reset_sent_at < 2.hours.ago
+    end
+    
+    # 試作 feedの定義
+    # 完全な実装は次章の「ユーザーをフォローする」を参照
+    def feed
+        Micropost.where("user_id = ?", id)
     end
     
     private
