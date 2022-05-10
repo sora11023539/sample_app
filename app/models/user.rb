@@ -1,6 +1,6 @@
 class User < ApplicationRecord
     # 読み取り、書き込みの両方を定義できる
-    attr_accessor :remember_token, :activation_token
+    attr_accessor :remember_token, :activation_token, :reset_token
     # callbaxk 保存する前に小文字に変換
     before_save :downcase_email
     # メソッド参照 メソッドを探し、ユーザー作成の前に実行
@@ -75,7 +75,23 @@ class User < ApplicationRecord
     
     # 有効化用のメールを送信する
     def send_activation_email
-        UserMailer.account_activation(self).deliver_naw
+        UserMailer.account_activation(self).deliver_now
+    end
+    
+    # pass再設定の属性を追加
+    def create_reset_digest
+        self.reset_token = User.new_token
+        update_columns(reset_digest: User.digest(reset_token), reset_sent_at: Time.zone.now)
+    end
+    
+    # pass再設定のメールを送信する
+    def send_password_reset_email
+        UserMailer.password_reset(self).deliver_now
+    end
+    
+    # pass再設定の期限が切れている場合はtrue
+    def password_reset_expired?
+        reset_sent_at < 2.hours.ago
     end
     
     private

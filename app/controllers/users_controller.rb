@@ -10,10 +10,12 @@ class UsersController < ApplicationController
   def show
     # @user変数定義
     # find dbからユーザーを取り出
+    # params httpのパラメーター
     @user = User.find(params[:id])
   end
   
   def new
+    # Userモデルをもとに空のUserを
     @user = User.new
   end
   
