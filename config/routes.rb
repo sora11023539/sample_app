@@ -18,9 +18,16 @@ Rails.application.routes.draw do
   
   # いつも使うやつをまとめて定義
   # show new edit index create update destroy
-  resources :users
+  resources :users do
+    member do
+      # following action, followers action 追加
+      get :following, :followers
+    end
+  end
+    
   # 名前付ルートを扱えるように
   resources :account_activations, only: [:edit]
   resources :password_resets, only: [:new, :create, :edit, :update]
   resources :microposts, only: [:create, :destroy]
+  resources :relationships, only: [:create, :destroy]
 end

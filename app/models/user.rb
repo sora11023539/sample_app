@@ -1,6 +1,19 @@
 class User < ApplicationRecord
     # micropostを複数所有する関連づけ
     has_many :microposts, dependent: :destroy
+    # follow list
+    has_many :active_relationships, class_name: "Relationship",
+                                    foreign_key: "follower_id",
+                                    dependent: :destroy
+    # follower list
+    has_many :passive_relationships, class_name: "Relationship",
+                                     foreign_key: "followed_id",
+                                     dependent: :destroy 
+    # followingの関連付け
+    # source followingの元はfollowed idの集合である
+    has_many :following, through: :active_relationships, source: :followed
+    has_many :followers, through: :passive_relationships, source: :follower
+                                    
     # 読み取り、書き込みの両方を定義できる
     attr_accessor :remember_token, :activation_token, :reset_token
     # callbaxk 保存する前に小文字に変換
@@ -100,6 +113,21 @@ class User < ApplicationRecord
     # 完全な実装は次章の「ユーザーをフォローする」を参照
     def feed
         Micropost.where("user_id = ?", id)
+    end
+    
+    # userをfollowする
+    def follow(other_user)
+        following << other_user
+    end
+
+    # follow解除
+    def unfollow(other_user)
+        active_relationships.find_by(followed_id: other_user.id).destroy
+    end
+    
+    # 現在のユーザーがフォローしていたらtrue返す
+    def following?(other_user)
+        following.include?(other_user)
     end
     
     private
